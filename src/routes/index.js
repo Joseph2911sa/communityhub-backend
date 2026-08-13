@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
+import eventRoutes from './eventRoutes.js';
 
 const router = Router();
 
@@ -10,7 +11,8 @@ router.get('/health', (req, res) => {
 
 router.use('/auth', authRoutes);
 router.use('/categories', categoryRoutes);
+router.use('/events', eventRoutes);
 
-// Próximos avances: /users, /events, /favorites, /notifications
+// Próximos avances: /users, /favorites, /notifications
 
 export default router;
