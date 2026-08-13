@@ -48,12 +48,11 @@ const userSchema = new Schema(
 );
 
 // Hashear la contraseña antes de guardar (solo si fue modificada)
-userSchema.pre('save', async function hashPassword(next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre('save', async function hashPassword() {
+  if (!this.isModified('password')) return;
 
   const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
   this.password = await bcrypt.hash(this.password, saltRounds);
-  next();
 });
 
 // Compara una contraseña en texto plano contra el hash almacenado
