@@ -6,6 +6,11 @@ import {
   updateEvent,
   deleteEvent,
 } from '../controllers/eventController.js';
+import {
+  registerForEvent,
+  cancelRegistration,
+} from '../controllers/registrationController.js';
+import { addFavorite, removeFavorite } from '../controllers/favoriteController.js';
 import { createEventValidator, updateEventValidator } from '../validators/eventValidators.js';
 import validate from '../middleware/validate.js';
 import protect from '../middleware/auth.js';
@@ -32,5 +37,10 @@ router.put(
   updateEvent
 );
 router.delete('/:id', protect, authorize('organizer', 'admin'), deleteEvent);
+
+router.post('/:id/register', protect, registerForEvent);
+router.delete('/:id/register', protect, cancelRegistration);
+router.post('/:id/favorite', protect, addFavorite);
+router.delete('/:id/favorite', protect, removeFavorite);
 
 export default router;
