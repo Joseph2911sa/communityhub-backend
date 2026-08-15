@@ -7,6 +7,13 @@ const CATEGORY_POPULATE = 'name';
 const ORGANIZER_POPULATE = 'firstName lastName email';
 
 /**
+ * Escapa los caracteres especiales de regex de un texto libre, para
+ * poder usarlo de forma segura dentro de un RegExp sin que actúe como
+ * comodín ni rompa la consulta (ej. ".", "*", "(").
+ */
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
  * Construye el filtro de Mongo a partir de los query params soportados
  * por GET /api/events (sección 12 del enunciado).
  */
@@ -32,7 +39,10 @@ const buildEventFilter = (query) => {
 
   if (Object.keys(dateFilter).length > 0) filter.date = dateFilter;
 
-  if (q) filter.$text = { $search: q };
+  // Coincidencia parcial de verdad (substring, no palabra completa) para
+  // "buscar mientras escribes". $text no sirve para esto: solo empareja
+  // palabras completas o su raíz gramatical.
+  if (q) filter.title = { $regex: escapeRegex(q), $options: 'i' };
 
   return filter;
 };
