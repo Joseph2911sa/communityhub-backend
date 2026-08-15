@@ -1,5 +1,6 @@
 import Event, { EVENT_STATUS } from '../models/Event.js';
 import Category from '../models/Category.js';
+import Registration from '../models/Registration.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
 
@@ -78,9 +79,15 @@ export const getEvent = catchAsync(async (req, res, next) => {
     return next(new AppError('Actividad no encontrada.', 404));
   }
 
+  const confirmedCount = await Registration.countDocuments({
+    event: event._id,
+    status: 'confirmed',
+  });
+  const spotsLeft = Math.max(event.maxCapacity - confirmedCount, 0);
+
   res.status(200).json({
     success: true,
-    data: { event },
+    data: { event, confirmedCount, spotsLeft },
   });
 });
 
