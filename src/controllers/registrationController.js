@@ -2,6 +2,7 @@ import Registration from '../models/Registration.js';
 import Event, { EVENT_STATUS } from '../models/Event.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
+import { getEventDateTime } from '../utils/getEventDateTime.js';
 
 const EVENT_POPULATE = 'title date time location image status';
 
@@ -20,8 +21,7 @@ export const registerForEvent = catchAsync(async (req, res, next) => {
     return next(new AppError('Actividad no encontrada.', 404));
   }
 
-  const now = new Date();
-  if (event.status !== EVENT_STATUS.ACTIVE || event.date < now) {
+  if (event.status !== EVENT_STATUS.ACTIVE || getEventDateTime(event.date, event.time) < new Date()) {
     return next(new AppError('El evento ya no está disponible para inscripciones.', 400));
   }
 
@@ -106,7 +106,12 @@ export const getMyRegistrations = catchAsync(async (req, res) => {
 
   registrations.sort((a, b) => {
     if (!a.event || !b.event) return 0;
-    return new Date(a.event.date) - new Date(b.event.date);
+    // getEventDateTime combina date+time para un orden cronológico real
+    // (dos eventos del mismo día calendario pero horas distintas no
+    // deben quedar "empatados").
+    return (
+      getEventDateTime(a.event.date, a.event.time) - getEventDateTime(b.event.date, b.event.time)
+    );
   });
 
   res.status(200).json({

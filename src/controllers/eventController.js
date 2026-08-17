@@ -3,6 +3,7 @@ import Category from '../models/Category.js';
 import Registration from '../models/Registration.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
+import { getEventDateTime } from '../utils/getEventDateTime.js';
 
 const CATEGORY_POPULATE = 'name';
 const ORGANIZER_POPULATE = 'firstName lastName email';
@@ -34,8 +35,17 @@ const buildEventFilter = (query) => {
 
   if (available === 'true') {
     filter.status = EVENT_STATUS.ACTIVE;
+    // El campo `date` en Mongo no lleva hora (siempre medianoche UTC del
+    // día), así que a nivel de base de datos solo podemos filtrar por
+    // día calendario: dejamos pasar TODO el día de hoy en adelante. El
+    // filtro preciso a la hora exacta se aplica después en JS con
+    // getEventDateTime (ver listEvents), una vez poblados los eventos.
     const now = new Date();
-    dateFilter.$gte = dateFilter.$gte && dateFilter.$gte > now ? dateFilter.$gte : now;
+    const todayUTCMidnight = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+    dateFilter.$gte =
+      dateFilter.$gte && dateFilter.$gte > todayUTCMidnight ? dateFilter.$gte : todayUTCMidnight;
   }
 
   if (Object.keys(dateFilter).length > 0) filter.date = dateFilter;
@@ -55,10 +65,17 @@ const buildEventFilter = (query) => {
 export const listEvents = catchAsync(async (req, res) => {
   const filter = buildEventFilter(req.query);
 
-  const events = await Event.find(filter)
+  let events = await Event.find(filter)
     .populate('category', CATEGORY_POPULATE)
     .populate('organizer', ORGANIZER_POPULATE)
     .sort({ date: 1 });
+
+  if (req.query.available === 'true') {
+    // Filtro preciso a la hora exacta (el filtro de Mongo de arriba solo
+    // pudo descartar por día calendario, no por hora).
+    const now = new Date();
+    events = events.filter((event) => getEventDateTime(event.date, event.time) >= now);
+  }
 
   res.status(200).json({
     success: true,
