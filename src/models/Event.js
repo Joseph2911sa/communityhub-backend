@@ -30,19 +30,27 @@ const eventSchema = new Schema(
       required: [true, 'La fecha es obligatoria'],
       validate: {
         validator: function isNotPastDate(value) {
-          // No permitir fechas pasadas (sección 8 del enunciado).
-          // "Hoy" se calcula en UTC, no en hora local del servidor:
-          // la fecha que llega del formulario (ej. "2026-08-17" de un
-          // <input type="date">) siempre se interpreta como medianoche
-          // UTC de ese día. Si comparábamos contra la medianoche LOCAL
-          // del servidor, un servidor en una zona detrás de UTC (ej.
-          // Costa Rica, UTC-6) rechazaba como "pasado" cualquier evento
-          // de hoy mismo, sin importar la hora.
-          const now = new Date();
-          const todayUTCMidnight = new Date(
-            Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+          if (!this.time) return true; // deja que el required de `time` reporte su propio error
+
+          const [hours, minutes] = this.time.split(':').map(Number);
+
+          // value ya está anclado a medianoche UTC del día calendario
+          // (por el fix anterior). Extraemos ese día con getters UTC, y
+          // reconstruimos la fecha-hora usando el constructor LOCAL de
+          // Date -- como el servidor corre en America/Costa_Rica (mismo
+          // huso horario real de los usuarios), esto sí representa el
+          // instante real que el organizador quiso decir.
+          const eventDateTime = new Date(
+            value.getUTCFullYear(),
+            value.getUTCMonth(),
+            value.getUTCDate(),
+            hours,
+            minutes,
+            0,
+            0
           );
-          return value >= todayUTCMidnight;
+
+          return eventDateTime >= new Date();
         },
         message: 'No se permiten actividades con fecha en el pasado',
       },
