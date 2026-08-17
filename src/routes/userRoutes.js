@@ -5,12 +5,25 @@ import {
   getMyNotifications,
   markNotificationAsRead,
 } from '../controllers/notificationController.js';
+import {
+  listUsers,
+  getUser,
+  updateUser,
+  deactivateUser,
+} from '../controllers/userController.js';
+import { updateUserValidator } from '../validators/userValidators.js';
+import validate from '../middleware/validate.js';
 import protect from '../middleware/auth.js';
+import authorize from '../middleware/authorize.js';
 
-// Nota: aquí solo van los endpoints /me/*. El CRUD completo de
-// /api/users (GET, GET/:id, PUT/:id, DELETE/:id con protect + authorize
-// ('admin')) es tarea aparte, pendiente.
 const router = Router();
+
+// CRUD de gestión de usuarios (solo admin). Va ANTES de las rutas
+// /me/* para que Express no confunda ":id" con la palabra "me".
+router.get('/', protect, authorize('admin'), listUsers);
+router.get('/:id', protect, authorize('admin'), getUser);
+router.put('/:id', protect, authorize('admin'), updateUserValidator, validate, updateUser);
+router.delete('/:id', protect, authorize('admin'), deactivateUser);
 
 router.get('/me/registrations', protect, getMyRegistrations);
 router.get('/me/favorites', protect, getMyFavorites);
