@@ -52,11 +52,11 @@ communityhub-backend/
 └── README.md
 ```
 
-## ✅ Estado actual — Avance 1
+## ✅ Estado actual
 
 - [x] Conexión a MongoDB vía Mongoose (`src/config/db.js`)
-- [x] Modelos iniciales: `User`, `Category`, `Event`, `Registration`, `Favorite`, `Notification`
-- [x] Autenticación JWT configurada:
+- [x] Modelos: `User`, `Category`, `Event`, `Registration`, `Favorite`, `Notification`
+- [x] Autenticación JWT:
   - `POST /api/auth/register`
   - `POST /api/auth/login`
   - `GET /api/auth/me` (protegida)
@@ -66,14 +66,18 @@ communityhub-backend/
 - [x] Manejo centralizado de errores (400 / 401 / 403 / 404 / 409 / 500), sin exponer errores internos de MongoDB
 - [x] Validación de entrada con `express-validator`
 - [x] `GET /api/health` para verificar que el servicio está en línea
+- [x] CRUD completo de `categories` (`GET`, `GET /:id`, `POST`, `PUT /:id`, `DELETE /:id`, escritura solo admin), con bloqueo de borrado si tiene actividades asociadas
+- [x] CRUD completo de `events` (`GET`, `GET /:id`, `POST`, `PUT /:id`, `DELETE /:id`), con validaciones (fecha no pasada, capacidad no negativa, título obligatorio) y ownership (un organizador no edita actividades ajenas)
+- [x] Inscripciones (`POST` / `DELETE /api/events/:id/register`) con las 5 validaciones del enunciado
+- [x] Favoritos (`POST` / `DELETE /api/events/:id/favorite`, `GET /api/users/me/favorites`)
+- [x] Notificaciones (`GET /api/users/me/notifications`, `PATCH /api/users/me/notifications/:id/read`)
+- [x] Gestión de usuarios para admin (`GET /api/users`, `GET /api/users/:id`, `PUT /api/users/:id`, `DELETE /api/users/:id`)
+- [x] Búsqueda y filtros por query params en `GET /api/events` (`category`, `location`, `organizer`, `date`, `available`, `q`)
+- [x] Seeders (`npm run seed`): categorías, usuarios, eventos, inscripciones y favoritos de ejemplo
 
-### Pendiente para próximos avances
+### Pendiente
 
-- CRUD completo de `events`, `categories`
-- Inscripciones (`/api/events/:id/register`) y favoritos (`/api/events/:id/favorite`)
-- Endpoints de `users` (roles: admin/organizer/user) y dashboards
-- Búsqueda y filtros por query params
-- Integración con AWS Lambda
+- Dashboards (sección 11 del enunciado): vistas de usuario, organizador y admin
 
 ## 🔑 Prueba rápida de la autenticación
 
