@@ -16,11 +16,6 @@ export const listUsers = catchAsync(async (req, res) => {
   });
 });
 
-/**
- * GET /api/users/:id
- * Retorna un usuario por id (protect + authorize('admin')). 404 si no
- * existe.
- */
 export const getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 

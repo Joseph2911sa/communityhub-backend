@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-/**
- * Establece la conexión con MongoDB usando Mongoose.
- * La URI se obtiene de la variable de entorno MONGODB_URI.
- */
 const connectDB = async () => {
   const uri = process.env.MONGODB_URI;
 

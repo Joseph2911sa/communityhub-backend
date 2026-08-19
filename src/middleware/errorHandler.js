@@ -5,7 +5,6 @@ import AppError from '../utils/AppError.js';
  * mensaje seguro para el cliente (nunca se expone el error interno crudo).
  */
 const normalizeError = (err) => {
-  // ObjectId inválido -> 400
   if (err.name === 'CastError') {
     return new AppError(`Identificador inválido: ${err.value}`, 400);
   }
@@ -16,7 +15,6 @@ const normalizeError = (err) => {
     return new AppError(`Ya existe un registro con ese ${field}.`, 409);
   }
 
-  // Errores de validación de Mongoose -> 400
   if (err.name === 'ValidationError') {
     const message = Object.values(err.errors)
       .map((e) => e.message)
@@ -24,7 +22,6 @@ const normalizeError = (err) => {
     return new AppError(message || 'Datos inválidos.', 400);
   }
 
-  // Errores de JWT
   if (err.name === 'JsonWebTokenError') {
     return new AppError('Token inválido.', 401);
   }

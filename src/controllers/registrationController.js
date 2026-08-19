@@ -43,7 +43,6 @@ export const registerForEvent = catchAsync(async (req, res, next) => {
   }
 
   if (existingRegistration) {
-    // Ya existía (cancelada): se reactiva el mismo documento, no se crea otro.
     existingRegistration.status = 'confirmed';
     await existingRegistration.save();
 
@@ -93,12 +92,6 @@ export const cancelRegistration = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * GET /api/users/me/registrations
- * Lista todas las inscripciones (historial completo, incluye canceladas)
- * del usuario autenticado, con el evento poblado, ordenadas por fecha
- * del evento.
- */
 export const getMyRegistrations = catchAsync(async (req, res) => {
   const registrations = await Registration.find({ user: req.user._id })
     .populate('event', EVENT_POPULATE)

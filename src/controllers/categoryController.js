@@ -17,10 +17,6 @@ export const listCategories = catchAsync(async (req, res) => {
   });
 });
 
-/**
- * GET /api/categories/:id
- * Retorna una categoría por id. Pública.
- */
 export const getCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
@@ -34,10 +30,6 @@ export const getCategory = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * POST /api/categories
- * Crea una categoría (protect + authorize('admin')).
- */
 export const createCategory = catchAsync(async (req, res) => {
   const { name, description } = req.body;
 
@@ -50,10 +42,6 @@ export const createCategory = catchAsync(async (req, res) => {
   });
 });
 
-/**
- * PUT /api/categories/:id
- * Actualiza una categoría (protect + authorize('admin')).
- */
 export const updateCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
 
@@ -74,11 +62,6 @@ export const updateCategory = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * DELETE /api/categories/:id
- * Elimina una categoría (protect + authorize('admin')).
- * No permite eliminar una categoría que tenga actividades asociadas.
- */
 export const deleteCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
   if (!category) {

@@ -3,10 +3,6 @@ import Event from '../models/Event.js';
 import Registration from '../models/Registration.js';
 import catchAsync from '../utils/catchAsync.js';
 
-/**
- * GET /api/admin/statistics
- * Panorama general para el dashboard de admin (protect + authorize('admin')).
- */
 export const getStatistics = catchAsync(async (req, res) => {
   const [
     totalUsers,

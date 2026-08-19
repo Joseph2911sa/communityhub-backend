@@ -9,7 +9,6 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-// --- Middlewares globales ---
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
@@ -26,7 +25,6 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 }
 
-// --- Rutas ---
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'CommunityHub API', version: '1.0.0' });
 });

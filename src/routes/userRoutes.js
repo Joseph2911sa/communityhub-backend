@@ -25,10 +25,6 @@ const router = Router();
 // segmentos). Si /:id fuera primero, "me" se leería como un id.
 router.put('/me', protect, updateMyProfileValidator, validate, updateMyProfile);
 
-// CRUD de gestión de usuarios (solo admin). Va ANTES de las rutas
-// /me/* de más abajo para que Express no confunda ":id" con la
-// palabra "me" en esas (mismo cuidado, para GET/DELETE que no tienen
-// contraparte /me con el mismo método en un solo segmento).
 router.get('/', protect, authorize('admin'), listUsers);
 router.get('/:id', protect, authorize('admin'), getUser);
 router.put('/:id', protect, authorize('admin'), updateUserValidator, validate, updateUser);

@@ -34,10 +34,6 @@ export const addFavorite = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * DELETE /api/events/:id/favorite
- * Quita una actividad de los favoritos del usuario autenticado.
- */
 export const removeFavorite = catchAsync(async (req, res, next) => {
   const favorite = await Favorite.findOneAndDelete({
     user: req.user._id,
@@ -54,11 +50,6 @@ export const removeFavorite = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * GET /api/users/me/favorites
- * Lista todas las actividades favoritas del usuario autenticado, con el
- * evento poblado.
- */
 export const getMyFavorites = catchAsync(async (req, res) => {
   const favorites = await Favorite.find({ user: req.user._id })
     .populate('event', EVENT_POPULATE)

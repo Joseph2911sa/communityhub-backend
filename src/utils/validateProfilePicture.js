@@ -5,7 +5,7 @@
  * como en la actualización de perfil propia (userController.js).
  */
 export function isValidProfilePicture(value) {
-  if (value === null || value === undefined) return true; // opcional
+  if (value === null || value === undefined) return true;
 
   if (typeof value !== 'string') return false;
 
@@ -15,5 +15,5 @@ export function isValidProfilePicture(value) {
   const base64Payload = match[2];
   const sizeInBytes = (base64Payload.length * 3) / 4;
 
-  return sizeInBytes <= 5 * 1024 * 1024; // 5MB
+  return sizeInBytes <= 5 * 1024 * 1024;
 }

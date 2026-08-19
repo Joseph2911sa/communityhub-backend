@@ -9,7 +9,7 @@ const cookieOptions = {
   httpOnly: true,
   secure: isProd,
   sameSite: 'lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 /**
@@ -43,10 +43,6 @@ export const register = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * POST /api/auth/login
- * Verifica credenciales y retorna un JWT.
- */
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -70,10 +66,6 @@ export const login = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * GET /api/auth/me
- * Retorna la información del usuario autenticado (requiere `protect`).
- */
 export const getMe = catchAsync(async (req, res) => {
   res.status(200).json({
     success: true,

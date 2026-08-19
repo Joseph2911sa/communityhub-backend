@@ -84,10 +84,6 @@ const buildEventFilter = (query) => {
   return filter;
 };
 
-/**
- * GET /api/events
- * Lista actividades con filtros combinables por query params. Pública.
- */
 export const listEvents = catchAsync(async (req, res) => {
   const filter = buildEventFilter(req.query);
 
@@ -111,10 +107,6 @@ export const listEvents = catchAsync(async (req, res) => {
   });
 });
 
-/**
- * GET /api/events/:id
- * Retorna una actividad por id, populada. Pública.
- */
 export const getEvent = catchAsync(async (req, res, next) => {
   const event = await Event.findById(req.params.id)
     .populate('category', CATEGORY_POPULATE)
@@ -207,8 +199,6 @@ export const updateEvent = catchAsync(async (req, res, next) => {
       event[field] = req.body[field];
     }
   });
-  // organizer nunca se reasigna desde este endpoint, aunque venga en el body.
-
   await event.save();
 
   res.status(200).json({

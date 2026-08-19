@@ -28,7 +28,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, 'La contraseña es obligatoria'],
       minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
-      select: false, // nunca se devuelve por defecto en las consultas
+      select: false,
     },
     profilePicture: {
       type: String,
@@ -47,7 +47,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Hashear la contraseña antes de guardar (solo si fue modificada)
 userSchema.pre('save', async function hashPassword() {
   if (!this.isModified('password')) return;
 
@@ -55,7 +54,6 @@ userSchema.pre('save', async function hashPassword() {
   this.password = await bcrypt.hash(this.password, saltRounds);
 });
 
-// Compara una contraseña en texto plano contra el hash almacenado
 userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
