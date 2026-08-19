@@ -3,6 +3,7 @@ import authRoutes from './authRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import eventRoutes from './eventRoutes.js';
 import userRoutes from './userRoutes.js';
+import adminRoutes from './adminRoutes.js';
 
 const router = Router();
 
@@ -14,7 +15,6 @@ router.use('/auth', authRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/events', eventRoutes);
 router.use('/users', userRoutes);
-
-// Próximos avances: CRUD completo de /users, /notifications
+router.use('/admin', adminRoutes);
 
 export default router;

@@ -16,6 +16,32 @@ const ORGANIZER_POPULATE = 'firstName lastName email';
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
+ * Calcula confirmedCount y spotsLeft (inscripciones confirmadas reales
+ * vs cupo) para uno o varios eventos, y los agrega al resultado.
+ * Acepta un solo documento de Event o un array de ellos. Siempre
+ * retorna objeto(s) plano(s) -- no documentos de Mongoose -- para que
+ * los campos extra queden en la respuesta JSON (asignar propiedades
+ * directo a un documento de Mongoose no se serializa).
+ */
+const addOccupancyData = async (eventOrEvents) => {
+  const isArray = Array.isArray(eventOrEvents);
+  const events = isArray ? eventOrEvents : [eventOrEvents];
+
+  const withOccupancy = await Promise.all(
+    events.map(async (event) => {
+      const confirmedCount = await Registration.countDocuments({
+        event: event._id,
+        status: 'confirmed',
+      });
+      const spotsLeft = Math.max(event.maxCapacity - confirmedCount, 0);
+      return { ...event.toObject(), confirmedCount, spotsLeft };
+    })
+  );
+
+  return isArray ? withOccupancy : withOccupancy[0];
+};
+
+/**
  * Construye el filtro de Mongo a partir de los query params soportados
  * por GET /api/events (sección 12 del enunciado).
  */
@@ -77,9 +103,11 @@ export const listEvents = catchAsync(async (req, res) => {
     events = events.filter((event) => getEventDateTime(event.date, event.time) >= now);
   }
 
+  const eventsWithOccupancy = await addOccupancyData(events);
+
   res.status(200).json({
     success: true,
-    data: { events },
+    data: { events: eventsWithOccupancy },
   });
 });
 
@@ -96,11 +124,7 @@ export const getEvent = catchAsync(async (req, res, next) => {
     return next(new AppError('Actividad no encontrada.', 404));
   }
 
-  const confirmedCount = await Registration.countDocuments({
-    event: event._id,
-    status: 'confirmed',
-  });
-  const spotsLeft = Math.max(event.maxCapacity - confirmedCount, 0);
+  const { confirmedCount, spotsLeft } = await addOccupancyData(event);
 
   res.status(200).json({
     success: true,
