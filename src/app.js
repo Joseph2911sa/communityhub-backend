@@ -16,7 +16,9 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+// Límite subido para admitir foto de perfil en base64 (hasta 5MB reales
+// ~= 6.7MB en texto base64, más margen para el prefijo del data URL).
+app.use(express.json({ limit: '8mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 

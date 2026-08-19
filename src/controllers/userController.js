@@ -87,3 +87,27 @@ export const deactivateUser = catchAsync(async (req, res, next) => {
     message: 'Usuario desactivado exitosamente.',
   });
 });
+
+/**
+ * PUT /api/users/me
+ * Autoservicio: cualquier usuario autenticado actualiza SU PROPIO
+ * perfil. Acepta solo firstName/lastName/profilePicture -- role e
+ * isActive se ignoran aunque vengan en el body, aquí no es gestión de
+ * admin. La validación de profilePicture (formato + tamaño) ya corrió
+ * en updateMyProfileValidator antes de llegar aquí.
+ */
+export const updateMyProfile = catchAsync(async (req, res) => {
+  const { firstName, lastName, profilePicture } = req.body;
+
+  if (firstName !== undefined) req.user.firstName = firstName;
+  if (lastName !== undefined) req.user.lastName = lastName;
+  if (profilePicture !== undefined) req.user.profilePicture = profilePicture;
+
+  await req.user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Perfil actualizado exitosamente.',
+    data: { user: req.user },
+  });
+});

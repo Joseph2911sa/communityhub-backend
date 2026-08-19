@@ -32,6 +32,12 @@ const normalizeError = (err) => {
     return new AppError('El token ha expirado.', 401);
   }
 
+  // Body de la petición demasiado grande (ej. foto de perfil en base64
+  // que supera el límite del body parser) -> 413
+  if (err.type === 'entity.too.large') {
+    return new AppError('El archivo es demasiado grande. El límite es de 5MB.', 413);
+  }
+
   return err;
 };
 

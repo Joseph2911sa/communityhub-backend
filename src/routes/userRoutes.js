@@ -10,16 +10,25 @@ import {
   getUser,
   updateUser,
   deactivateUser,
+  updateMyProfile,
 } from '../controllers/userController.js';
-import { updateUserValidator } from '../validators/userValidators.js';
+import { updateUserValidator, updateMyProfileValidator } from '../validators/userValidators.js';
 import validate from '../middleware/validate.js';
 import protect from '../middleware/auth.js';
 import authorize from '../middleware/authorize.js';
 
 const router = Router();
 
+// PUT /me (autoservicio) va ANTES de PUT /:id -- mismo método HTTP,
+// un solo segmento de path cada una, así que el orden sí importa aquí
+// (a diferencia de /me/registrations, que no colisiona por tener 2
+// segmentos). Si /:id fuera primero, "me" se leería como un id.
+router.put('/me', protect, updateMyProfileValidator, validate, updateMyProfile);
+
 // CRUD de gestión de usuarios (solo admin). Va ANTES de las rutas
-// /me/* para que Express no confunda ":id" con la palabra "me".
+// /me/* de más abajo para que Express no confunda ":id" con la
+// palabra "me" en esas (mismo cuidado, para GET/DELETE que no tienen
+// contraparte /me con el mismo método en un solo segmento).
 router.get('/', protect, authorize('admin'), listUsers);
 router.get('/:id', protect, authorize('admin'), getUser);
 router.put('/:id', protect, authorize('admin'), updateUserValidator, validate, updateUser);
